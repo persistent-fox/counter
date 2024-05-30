@@ -23,20 +23,31 @@ export const Counter = () => {
 
 	const setValuesHandler = () => {
 		setBoardValue(startValue);
-		localStorage.setItem('maxValue', JSON.stringify(maxValue));
 		localStorage.setItem('startValue', JSON.stringify(startValue));
+		localStorage.setItem('maxValue', JSON.stringify(maxValue));
 	};
 
+	// useEffect(() => {
+	// 	const maxValueLoc = localStorage.getItem('maxValue');
+	// 	const startValueLoc = localStorage.getItem('startValue');
+	// 	if (maxValueLoc) {
+	// 		setMaxValue(JSON.parse(maxValueLoc));
+	// 	}
+	// 	if (startValueLoc) {
+	// 		setMaxValue(JSON.parse(startValueLoc));
+	// 	}
+	// }, []);
+
 	useEffect(() => {
-		const maxValue = localStorage.getItem('maxValue');
-		const startValue = localStorage.getItem('startValue');
-		if (maxValue) {
-			setMaxValue(JSON.parse(maxValue));
+		const maxValueLoc = localStorage.getItem('maxValue');
+		const startValueLoc = localStorage.getItem('startValue');
+		if (maxValueLoc) {
+			setMaxValue(JSON.parse(maxValueLoc));
 		}
-		if (startValue) {
-			setMaxValue(JSON.parse(startValue));
+		if (startValueLoc) {
+			setMaxValue(JSON.parse(startValueLoc));
 		}
-	}, []);
+	}, [maxValue, startValue]);
 
 	return (
 		<StyledCounter>
