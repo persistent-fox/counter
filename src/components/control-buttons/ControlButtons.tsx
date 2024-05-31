@@ -3,13 +3,14 @@ import { Button } from '../button/Button';
 
 type TControlButtonsProps = {
 	onChangeIncHandler: () => void;
+	onChangeResetHandler: () => void;
 };
 
-export const ControlButtons = ({ onChangeIncHandler }: TControlButtonsProps) => {
+export const ControlButtons = ({ onChangeIncHandler, onChangeResetHandler }: TControlButtonsProps) => {
 	return (
 		<StyledControlButtons>
 			<Button callBack={onChangeIncHandler}>inc</Button>
-			<Button callBack={() => {}}>reset</Button>
+			<Button callBack={onChangeResetHandler}>reset</Button>
 		</StyledControlButtons>
 	);
 };

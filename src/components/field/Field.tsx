@@ -1,5 +1,5 @@
 import { ChangeEvent } from 'react';
-import { styled } from 'styled-components';
+import { css, styled } from 'styled-components';
 import { TValue } from '../../types/types';
 
 type TFieldProps = {
@@ -14,9 +14,13 @@ export const Field = ({ itemValue, callBack }: TFieldProps) => {
 	return (
 		<StyledField>
 			<Label htmlFor=''>{itemValue.title}:</Label>
-			<Input value={itemValue.value} onChange={onChange} type='number' />
+			<Input error={itemValue.error ? 'error' : ''} value={itemValue.value} onChange={onChange} type='number' />
 		</StyledField>
 	);
+};
+
+type TInputProps = {
+	error: 'error' | '';
 };
 
 export const StyledField = styled.div`
@@ -33,7 +37,7 @@ const Label = styled.label`
 	color: ${props => props.theme.colors.accent};
 `;
 
-const Input = styled.input`
+const Input = styled.input<TInputProps>`
 	max-width: 228px;
 	width: 100%;
 	padding: 10px 15px;
@@ -42,4 +46,10 @@ const Input = styled.input`
 	color: ${props => props.theme.colors.primary};
 	font-weight: 900;
 	text-align: center;
+	${props =>
+		props.error === 'error' &&
+		css`
+			border: 3px solid ${props => props.theme.colors.error};
+			background-color: ${props => props.theme.colors.tertiary};
+		`}
 `;

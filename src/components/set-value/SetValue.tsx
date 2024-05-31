@@ -1,11 +1,13 @@
 import { styled } from 'styled-components';
 import { Button } from '../button/Button';
+import { TValue } from '../../types/types';
 
 type TSetValueProps = {
 	setValuesHandler: () => void;
+	values: Record<string, TValue>;
 };
 
-export const SetValue = ({ setValuesHandler }: TSetValueProps) => {
+export const SetValue = ({ values, setValuesHandler }: TSetValueProps) => {
 	return (
 		<StyledSetValue>
 			<Button callBack={setValuesHandler}>set</Button>
