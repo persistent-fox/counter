@@ -51,7 +51,6 @@ export const Counter = () => {
 		const equal =
 			(values[key].id === start && +values[max].value === +value) ||
 			(values[key].id === max && +values[start].value === +value);
-
 		if (less || more || equal) {
 			const newValues = {
 				...values,
@@ -67,13 +66,31 @@ export const Counter = () => {
 				[reset]: { ...disabledBtns[reset], disabled: true },
 			});
 		} else {
-			const newValues = { ...values, [key]: { ...values[key], value, error: +value < 0 ? true : false } };
-			setValues(newValues);
+			const startValue = values[key].id === start;
+			const maxValue = values[key].id === max;
+			if (startValue) {
+				const newValues = {
+					...values,
+					[key]: { ...values[key], value, error: +value < 0 ? true : false },
+					[max]: { ...values[max], error: false },
+					[board]: { ...values[board], value: value, error: false },
+				};
+				setValues(newValues);
+			}
+			if (maxValue) {
+				const newValues = {
+					...values,
+					[key]: { ...values[key], value, error: +value < 0 ? true : false },
+					[start]: { ...values[start], error: false },
+					[board]: { ...values[board], value: values[start].value, error: false },
+				};
+				setValues(newValues);
+			}
 			setDisabledBtns({
 				...disabledBtns,
 				[set]: { ...disabledBtns[set], disabled: +value < 0 ? true : false },
-				[inc]: { ...disabledBtns[inc], disabled: false },
-				[reset]: { ...disabledBtns[reset], disabled: false },
+				[inc]: { ...disabledBtns[inc], disabled: true },
+				[reset]: { ...disabledBtns[reset], disabled: true },
 			});
 		}
 	};
@@ -91,23 +108,38 @@ export const Counter = () => {
 				},
 			});
 		}
+		if (boardValue === +values[max].value) {
+			setDisabledBtns({ ...disabledBtns, [inc]: { ...disabledBtns[inc], disabled: true } });
+		}
 	};
 
 	const onChangeResetHandler = () => {
 		setValues({ ...values, [board]: { ...values[board], value: values[start].value, error: false } });
+		setDisabledBtns({ ...disabledBtns, [inc]: { ...disabledBtns[inc], disabled: false } });
 	};
 
 	const setValuesHandler = () => {
 		const newSavedValues = { ...values, [board]: { ...values[board], value: values[start].value } };
+		const newSavedButtons = {
+			[set]: { ...disabledBtns[set], disabled: true },
+			[inc]: { ...disabledBtns[inc], disabled: false },
+			[reset]: { ...disabledBtns[reset], disabled: false },
+		};
+
 		setValues(newSavedValues);
+		setDisabledBtns(newSavedButtons);
 		localStorage.setItem('values', JSON.stringify(newSavedValues));
+		localStorage.setItem('buttons', JSON.stringify(newSavedButtons));
 	};
 
 	useEffect(() => {
 		const savedValues = localStorage.getItem('values');
-		if (savedValues) {
+		const savedButtons = localStorage.getItem('buttons');
+		if (savedValues && savedButtons) {
 			const parsedValues = JSON.parse(savedValues);
+			const parsedButtons = JSON.parse(savedButtons);
 			setValues(parsedValues);
+			setDisabledBtns(parsedButtons);
 		}
 	}, []);
 
