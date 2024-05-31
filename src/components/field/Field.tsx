@@ -1,21 +1,20 @@
 import { ChangeEvent } from 'react';
 import { styled } from 'styled-components';
+import { TValue } from '../../types/types';
 
 type TFieldProps = {
-	label: string;
-	maxValue?: string;
-	startValue?: string;
+	itemValue: TValue;
 	callBack: (value: string) => void;
 };
 
-export const Field = ({ label, callBack }: TFieldProps) => {
+export const Field = ({ itemValue, callBack }: TFieldProps) => {
 	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
 		callBack(e.currentTarget.value);
 	};
 	return (
 		<StyledField>
-			<Label htmlFor=''>{label}:</Label>
-			<Input onChange={onChange} type='number' />
+			<Label htmlFor=''>{itemValue.title}:</Label>
+			<Input value={itemValue.value} onChange={onChange} type='number' />
 		</StyledField>
 	);
 };

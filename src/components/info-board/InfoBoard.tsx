@@ -1,13 +1,14 @@
-import React from 'react';
 import styled from 'styled-components';
+import { TValue } from '../../types/types';
 
 type TInfoBoardProps = {
-	title: string;
-	boardValue: string;
+	boardValue: TValue;
 };
 
-export const InfoBoard = ({ title, boardValue }: TInfoBoardProps) => {
-	return <StyledInfoBoard>{boardValue ? boardValue : title}</StyledInfoBoard>;
+export const InfoBoard = ({ boardValue }: TInfoBoardProps) => {
+	console.log(boardValue.value);
+
+	return <StyledInfoBoard>{!!boardValue.value ? boardValue.value : boardValue.title}</StyledInfoBoard>;
 };
 
 const StyledInfoBoard = styled.span`

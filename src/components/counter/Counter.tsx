@@ -5,64 +5,59 @@ import { InfoBoard } from '../info-board/InfoBoard';
 import { ControlButtons } from '../control-buttons/ControlButtons';
 import { styled } from 'styled-components';
 import { useEffect, useState } from 'react';
+import { TValue } from '../../types/types';
+import { board, max, start } from '../../mock/data';
 
 export const Counter = () => {
-	const [maxValue, setMaxValue] = useState('0');
-	const [boardValue, setBoardValue] = useState('');
-	const [startValue, setStartValue] = useState('0');
+	const [values, setValues] = useState<Record<string, TValue>>({
+		[start]: {
+			id: start,
+			title: 'start value',
+			value: '0',
+		},
+		[max]: {
+			id: max,
+			title: 'max value',
+			value: '0',
+		},
+		[board]: {
+			id: board,
+			title: 'Board',
+			value: '0',
+		},
+	});
 
-	const onChangeMaxValue = (value: string) => {
-		setMaxValue(value);
-	};
-
-	const onChangeStartValue = (value: string) => {
-		setStartValue(value);
+	const onChangeValue = (key: string, value: string) => {
+		const newValues = { ...values, [key]: { ...values[key], value } };
+		setValues(newValues);
 	};
 
 	const onChangeIncHandler = () => {};
 
 	const setValuesHandler = () => {
-		setBoardValue(startValue);
-		localStorage.setItem('startValue', JSON.stringify(startValue));
-		localStorage.setItem('maxValue', JSON.stringify(maxValue));
+		setValues({ ...values, board: values.start });
+		localStorage.setItem('startValue', JSON.stringify(values.start));
+		localStorage.setItem('maxValue', JSON.stringify(values.max));
 	};
 
-	// useEffect(() => {
-	// 	const maxValueLoc = localStorage.getItem('maxValue');
-	// 	const startValueLoc = localStorage.getItem('startValue');
-	// 	if (maxValueLoc) {
-	// 		setMaxValue(JSON.parse(maxValueLoc));
-	// 	}
-	// 	if (startValueLoc) {
-	// 		setMaxValue(JSON.parse(startValueLoc));
-	// 	}
-	// }, []);
-
 	useEffect(() => {
-		const maxValueLoc = localStorage.getItem('maxValue');
-		const startValueLoc = localStorage.getItem('startValue');
-		if (maxValueLoc) {
-			setMaxValue(JSON.parse(maxValueLoc));
-		}
-		if (startValueLoc) {
-			setMaxValue(JSON.parse(startValueLoc));
-		}
-	}, [maxValue, startValue]);
+		setValues({
+			startValue: JSON.parse(localStorage.getItem('startValue') || '0'),
+			maxValue: JSON.parse(localStorage.getItem('maxValue') || '0'),
+			boardValue: JSON.parse(localStorage.getItem('startValue') || '0'),
+		});
+		console.log('values', values);
+	}, []);
 
 	return (
 		<StyledCounter>
 			<FlexWrapper gap='20px' direction='column'>
-				<ValueFields
-					onChangeStartValue={onChangeStartValue}
-					onChangeMaxValue={onChangeMaxValue}
-					maxValue={maxValue}
-					startValue={startValue}
-				/>
+				<ValueFields onChangeValue={onChangeValue} values={values} />
 				<SetValue setValuesHandler={setValuesHandler} />
 			</FlexWrapper>
 
 			<FlexWrapper gap='20px' direction='column'>
-				<InfoBoard boardValue={boardValue} title='Board' />
+				<InfoBoard boardValue={values[board]} />
 				<ControlButtons onChangeIncHandler={onChangeIncHandler} />
 			</FlexWrapper>
 		</StyledCounter>
