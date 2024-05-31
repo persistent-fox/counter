@@ -5,7 +5,7 @@ import { InfoBoard } from '../info-board/InfoBoard';
 import { ControlButtons } from '../control-buttons/ControlButtons';
 import { styled } from 'styled-components';
 import { useEffect, useState } from 'react';
-import { TValue } from '../../types/types';
+import { TDisabledBtn, TValue } from '../../types/types';
 import { board, inc, max, reset, set, start } from '../../mock/data';
 
 export const Counter = () => {
@@ -30,7 +30,7 @@ export const Counter = () => {
 		},
 	});
 
-	const [disabledBtns, setDisabledBtns] = useState({
+	const [disabledBtns, setDisabledBtns] = useState<Record<string, TDisabledBtn>>({
 		[set]: {
 			id: set,
 			disabled: false,
@@ -60,9 +60,21 @@ export const Counter = () => {
 				[board]: { ...values[board], value: 'Incorrect value', error: true },
 			};
 			setValues(newValues);
+			setDisabledBtns({
+				...disabledBtns,
+				[set]: { ...disabledBtns[set], disabled: true },
+				[inc]: { ...disabledBtns[inc], disabled: true },
+				[reset]: { ...disabledBtns[reset], disabled: true },
+			});
 		} else {
 			const newValues = { ...values, [key]: { ...values[key], value, error: +value < 0 ? true : false } };
 			setValues(newValues);
+			setDisabledBtns({
+				...disabledBtns,
+				[set]: { ...disabledBtns[set], disabled: +value < 0 ? true : false },
+				[inc]: { ...disabledBtns[inc], disabled: false },
+				[reset]: { ...disabledBtns[reset], disabled: false },
+			});
 		}
 	};
 
@@ -103,12 +115,16 @@ export const Counter = () => {
 		<StyledCounter>
 			<FlexWrapper gap='20px' direction='column'>
 				<ValueFields onChangeValue={onChangeValue} values={values} />
-				<SetValue values={values} setValuesHandler={setValuesHandler} />
+				<SetValue disabledBtns={disabledBtns[set]} values={values} setValuesHandler={setValuesHandler} />
 			</FlexWrapper>
 
 			<FlexWrapper gap='20px' direction='column'>
 				<InfoBoard boardValue={values[board]} />
-				<ControlButtons onChangeIncHandler={onChangeIncHandler} onChangeResetHandler={onChangeResetHandler} />
+				<ControlButtons
+					disabledBtns={disabledBtns}
+					onChangeIncHandler={onChangeIncHandler}
+					onChangeResetHandler={onChangeResetHandler}
+				/>
 			</FlexWrapper>
 		</StyledCounter>
 	);

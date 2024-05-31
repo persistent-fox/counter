@@ -6,3 +6,8 @@ export type TValue = {
 	value: string;
 	error: boolean;
 };
+
+export type TDisabledBtn = {
+	id: string;
+	disabled: boolean;
+};

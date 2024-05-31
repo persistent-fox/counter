@@ -4,10 +4,15 @@ import { styled } from 'styled-components';
 type TButtonProps = {
 	children: React.ReactNode;
 	callBack: () => void;
+	disabled: boolean;
 };
 
-export const Button = ({ children, callBack }: TButtonProps) => {
-	return <StyledButton onClick={callBack}>{children}</StyledButton>;
+export const Button = ({ disabled, children, callBack }: TButtonProps) => {
+	return (
+		<StyledButton disabled={disabled} onClick={callBack}>
+			{children}
+		</StyledButton>
+	);
 };
 
 export const StyledButton = styled.button`

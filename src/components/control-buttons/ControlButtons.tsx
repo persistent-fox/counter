@@ -1,16 +1,23 @@
 import { styled } from 'styled-components';
 import { Button } from '../button/Button';
+import { TDisabledBtn } from '../../types/types';
+import { inc, reset } from '../../mock/data';
 
 type TControlButtonsProps = {
+	disabledBtns: Record<string, TDisabledBtn>;
 	onChangeIncHandler: () => void;
 	onChangeResetHandler: () => void;
 };
 
-export const ControlButtons = ({ onChangeIncHandler, onChangeResetHandler }: TControlButtonsProps) => {
+export const ControlButtons = ({ disabledBtns, onChangeIncHandler, onChangeResetHandler }: TControlButtonsProps) => {
 	return (
 		<StyledControlButtons>
-			<Button callBack={onChangeIncHandler}>inc</Button>
-			<Button callBack={onChangeResetHandler}>reset</Button>
+			<Button disabled={disabledBtns[inc].disabled} callBack={onChangeIncHandler}>
+				inc
+			</Button>
+			<Button disabled={disabledBtns[reset].disabled} callBack={onChangeResetHandler}>
+				reset
+			</Button>
 		</StyledControlButtons>
 	);
 };
