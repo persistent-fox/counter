@@ -3,18 +3,19 @@ import { css, styled } from 'styled-components';
 import { TValue } from '../../types/types';
 
 type TFieldProps = {
+	error: boolean;
 	itemValue: TValue;
-	callBack: (value: string) => void;
+	callBack: (value: number) => void;
 };
 
-export const Field = ({ itemValue, callBack }: TFieldProps) => {
+export const Field = ({ itemValue, error, callBack }: TFieldProps) => {
 	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-		callBack(e.currentTarget.value);
+		callBack(+e.currentTarget.value);
 	};
 	return (
 		<StyledField>
 			<Label htmlFor=''>{itemValue.title}:</Label>
-			<Input error={itemValue.error ? 'error' : ''} value={itemValue.value} onChange={onChange} type='number' />
+			<Input error={error ? 'error' : ''} value={itemValue.value} onChange={onChange} type='number' />
 		</StyledField>
 	);
 };

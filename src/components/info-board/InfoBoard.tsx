@@ -3,12 +3,13 @@ import { TValue } from '../../types/types';
 
 type TInfoBoardProps = {
 	boardValue: TValue;
+	boardError: boolean;
 };
 
-export const InfoBoard = ({ boardValue }: TInfoBoardProps) => {
+export const InfoBoard = ({ boardValue, boardError }: TInfoBoardProps) => {
 	return (
-		<StyledInfoBoard error={boardValue.error ? 'error' : ''}>
-			{!!boardValue.value ? boardValue.value : boardValue.title}
+		<StyledInfoBoard error={boardError && boardValue.value !== 0 ? 'error' : ''}>
+			{boardValue.value !== 0 ? boardValue.value : "enter values and press 'set'"}
 		</StyledInfoBoard>
 	);
 };

@@ -1,24 +1,20 @@
 import { styled } from 'styled-components';
 import { Field, StyledField } from '../field/Field';
 import { TValue } from '../../types/types';
-import { board } from '../../mock/data';
+import { max, start } from '../../mock/data';
 
 type TValueFieldsProps = {
+	maxError: boolean;
+	startError: boolean;
 	values: Record<string, TValue>;
-	onChangeValue: (key: string, value: string) => void;
+	onChangeValue: (key: string, value: number) => void;
 };
 
-export const ValueFields = ({ values, onChangeValue }: TValueFieldsProps) => {
+export const ValueFields = ({ values, startError, maxError, onChangeValue }: TValueFieldsProps) => {
 	return (
 		<StyledValueFields>
-			{Object.values(values)
-				.filter(itemValue => itemValue.id !== board)
-				.map(itemValue => {
-					const onChangeValueByType = (value: string) => {
-						onChangeValue(itemValue.id, value);
-					};
-					return <Field key={itemValue.id} callBack={onChangeValueByType} itemValue={itemValue} />;
-				})}
+			<Field key={start} error={maxError} callBack={value => onChangeValue(start, value)} itemValue={values[start]} />
+			<Field key={max} error={startError} callBack={value => onChangeValue(max, value)} itemValue={values[max]} />
 		</StyledValueFields>
 	);
 };

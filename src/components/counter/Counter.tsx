@@ -4,132 +4,100 @@ import { SetValue } from '../set-value/SetValue';
 import { InfoBoard } from '../info-board/InfoBoard';
 import { ControlButtons } from '../control-buttons/ControlButtons';
 import { styled } from 'styled-components';
-import { useEffect, useState } from 'react';
-import { TDisabledBtn, TValue } from '../../types/types';
+import { useEffect } from 'react';
 import { board, inc, max, reset, set, start } from '../../mock/data';
+import { useDispatch } from 'react-redux';
+import { changeValueAC, incrementValueAC, resetValueAC } from '../../store/reducers/counterValuesReducer';
+import { useSelector } from 'react-redux';
+import { TRootReducer } from '../../store/store';
+import { changeIncAC, changeResetAC, changeSetAC } from '../../store/reducers/counterBtnsReducer';
+import { TDisabledBtn, TValue } from '../../types/types';
 
 export const Counter = () => {
-	const [values, setValues] = useState<Record<string, TValue>>({
-		[start]: {
-			id: start,
-			title: 'start value',
-			value: '0',
-			error: false,
-		},
-		[max]: {
-			id: max,
-			title: 'max value',
-			value: '0',
-			error: false,
-		},
-		[board]: {
-			id: board,
-			title: 'board',
-			value: 'enter values and press "set"',
-			error: false,
-		},
-	});
+	const dispatch = useDispatch();
+	const values = useSelector<TRootReducer, Record<string, TValue>>(state => state.values);
+	const startValue = useSelector<TRootReducer, TValue>(state => state.values[start]);
+	const maxValue = useSelector<TRootReducer, TValue>(state => state.values[max]);
+	const boardValue = useSelector<TRootReducer, TValue>(state => state.values[board]);
+	const controlButtons = useSelector<TRootReducer, Record<string, TDisabledBtn>>(state => state.buttons);
 
-	const [disabledBtns, setDisabledBtns] = useState<Record<string, TDisabledBtn>>({
-		[set]: {
-			id: set,
-			disabled: false,
-		},
-		[inc]: {
-			id: inc,
-			disabled: false,
-		},
-		[reset]: {
-			id: reset,
-			disabled: false,
-		},
-	});
+	const maxError = maxValue.value <= startValue.value || maxValue.value < 0;
+	const startError = maxValue.value <= startValue.value || startValue.value < 0;
+	const boardError = maxError || startError || boardValue.value === maxValue.value;
 
-	const onChangeValue = (key: string, value: string) => {
-		const less = values[key].id === max && +values[start].value > +value;
-		const more = values[key].id === start && +values[max].value < +value;
-		const equal =
-			(values[key].id === start && +values[max].value === +value) ||
-			(values[key].id === max && +values[start].value === +value);
-		if (less || more || equal) {
-			const newValues = {
-				...values,
-				[max]: { ...values[max], error: true },
-				[key]: { ...values[key], value, error: true },
-				[board]: { ...values[board], value: 'Incorrect value', error: true },
-			};
-			setValues(newValues);
-			setDisabledBtns({
-				...disabledBtns,
-				[set]: { ...disabledBtns[set], disabled: true },
-				[inc]: { ...disabledBtns[inc], disabled: true },
-				[reset]: { ...disabledBtns[reset], disabled: true },
-			});
-		} else {
-			const startValue = values[key].id === start;
-			const maxValue = values[key].id === max;
-			if (startValue) {
-				const newValues = {
-					...values,
-					[key]: { ...values[key], value, error: +value < 0 ? true : false },
-					[max]: { ...values[max], error: false },
-					[board]: { ...values[board], value: value, error: false },
-				};
-				setValues(newValues);
-			}
-			if (maxValue) {
-				const newValues = {
-					...values,
-					[key]: { ...values[key], value, error: +value < 0 ? true : false },
-					[start]: { ...values[start], error: false },
-					[board]: { ...values[board], value: values[start].value, error: false },
-				};
-				setValues(newValues);
-			}
-			setDisabledBtns({
-				...disabledBtns,
-				[set]: { ...disabledBtns[set], disabled: +value < 0 ? true : false },
-				[inc]: { ...disabledBtns[inc], disabled: true },
-				[reset]: { ...disabledBtns[reset], disabled: true },
-			});
-		}
+	const onChangeValue = (key: string, value: number) => {
+		dispatch(changeValueAC(key, value));
+
+		dispatch(changeSetAC(value < 0 ? true : false));
+		dispatch(changeIncAC(false));
+		dispatch(changeResetAC(false));
 	};
 
-	const onChangeIncHandler = () => {
-		const boardValue = +values[board].value + 1;
+	const prom = new Promise((resolve, reject) => {
+		setTimeout(
+			response => {
+				if (response.status >= 200 && response.status < 400) {
+					resolve(response.data);
+				} else {
+					reject(response.error);
+				}
+			},
+			2000,
+			{ status: 400, data: { name: 'Tom Riddle', age: 17, murders: 4 }, error: 'Not found' }
+		);
+	});
 
-		if (boardValue <= +values[max].value) {
-			setValues({
-				...values,
-				[board]: {
-					...values[board],
-					value: boardValue.toString(),
-					error: boardValue === +values[max].value ? true : values[board].error,
-				},
-			});
+	prom
+		.then(
+			res => {
+				console.log(res);
+
+				return new Promise((resolve, reject) => {
+					setTimeout(
+						response => {
+							if (response.status >= 200 && response.status < 400) {
+								resolve({ res: res, res2: response.data });
+							} else {
+								reject(response.error);
+							}
+						},
+						2000,
+						{ status: 200, data: { school: 'Hogwarts', house: 'Slytherin' }, error: {} }
+					);
+				});
+			},
+			err => {
+				console.log('err', err);
+				return { name: 'Tom Riddle' };
+			}
+		)
+		.then(res2 => {
+			console.log(res2, 'newData');
+		});
+
+	const onChangeIncHandler = () => {
+		const newBoardValue = boardValue.value + 1;
+
+		if (newBoardValue <= maxValue.value) {
+			dispatch(incrementValueAC(boardValue.value));
 		}
-		if (boardValue === +values[max].value) {
-			setDisabledBtns({ ...disabledBtns, [inc]: { ...disabledBtns[inc], disabled: true } });
+		if (newBoardValue === maxValue.value) {
+			dispatch(changeIncAC(true));
 		}
 	};
 
 	const onChangeResetHandler = () => {
-		setValues({ ...values, [board]: { ...values[board], value: values[start].value, error: false } });
-		setDisabledBtns({ ...disabledBtns, [inc]: { ...disabledBtns[inc], disabled: false } });
+		dispatch(resetValueAC());
+		dispatch(changeIncAC(false));
 	};
 
 	const setValuesHandler = () => {
-		const newSavedValues = { ...values, [board]: { ...values[board], value: values[start].value } };
-		const newSavedButtons = {
-			[set]: { ...disabledBtns[set], disabled: true },
-			[inc]: { ...disabledBtns[inc], disabled: false },
-			[reset]: { ...disabledBtns[reset], disabled: false },
-		};
-
-		setValues(newSavedValues);
-		setDisabledBtns(newSavedButtons);
-		localStorage.setItem('values', JSON.stringify(newSavedValues));
-		localStorage.setItem('buttons', JSON.stringify(newSavedButtons));
+		dispatch(changeValueAC(board, startValue.value));
+		dispatch(changeIncAC(false));
+		dispatch(changeSetAC(true));
+		dispatch(changeResetAC(false));
+		localStorage.setItem('values', JSON.stringify(startValue.value));
+		localStorage.setItem('buttons', JSON.stringify(controlButtons));
 	};
 
 	useEffect(() => {
@@ -138,22 +106,27 @@ export const Counter = () => {
 		if (savedValues && savedButtons) {
 			const parsedValues = JSON.parse(savedValues);
 			const parsedButtons = JSON.parse(savedButtons);
-			setValues(parsedValues);
-			setDisabledBtns(parsedButtons);
+			dispatch(changeValueAC(board, parsedValues[board].value));
+			dispatch(changeValueAC(start, parsedValues[start].value));
+			dispatch(changeValueAC(max, parsedValues[max].value));
+
+			dispatch(changeIncAC(parsedButtons[inc]));
+			dispatch(changeSetAC(parsedButtons[set]));
+			dispatch(changeResetAC(parsedButtons[reset]));
 		}
 	}, []);
 
 	return (
 		<StyledCounter>
 			<FlexWrapper gap='20px' direction='column'>
-				<ValueFields onChangeValue={onChangeValue} values={values} />
-				<SetValue disabledBtns={disabledBtns[set]} values={values} setValuesHandler={setValuesHandler} />
+				<ValueFields startError={startError} maxError={maxError} onChangeValue={onChangeValue} values={values} />
+				<SetValue disabledBtns={controlButtons[set]} values={values} setValuesHandler={setValuesHandler} />
 			</FlexWrapper>
 
 			<FlexWrapper gap='20px' direction='column'>
-				<InfoBoard boardValue={values[board]} />
+				<InfoBoard boardError={boardError} boardValue={boardValue} />
 				<ControlButtons
-					disabledBtns={disabledBtns}
+					disabledBtns={controlButtons}
 					onChangeIncHandler={onChangeIncHandler}
 					onChangeResetHandler={onChangeResetHandler}
 				/>
