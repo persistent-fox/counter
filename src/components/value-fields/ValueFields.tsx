@@ -2,15 +2,17 @@ import { styled } from 'styled-components';
 import { Field, StyledField } from '../field/Field';
 import { TValue } from '../../types/types';
 import { max, start } from '../../mock/data';
+import { useSelector } from 'react-redux';
+import { TRootReducer } from '../../store/store';
 
 type TValueFieldsProps = {
 	maxError: boolean;
 	startError: boolean;
-	values: Record<string, TValue>;
 	onChangeValue: (key: string, value: number) => void;
 };
 
-export const ValueFields = ({ values, startError, maxError, onChangeValue }: TValueFieldsProps) => {
+export const ValueFields = ({ startError, maxError, onChangeValue }: TValueFieldsProps) => {
+	const values = useSelector<TRootReducer, Record<string, TValue>>(state => state.values);
 	return (
 		<StyledValueFields>
 			<Field key={start} error={maxError} callBack={value => onChangeValue(start, value)} itemValue={values[start]} />

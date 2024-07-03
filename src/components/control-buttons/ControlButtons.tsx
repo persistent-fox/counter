@@ -2,20 +2,22 @@ import { styled } from 'styled-components';
 import { Button } from '../button/Button';
 import { TDisabledBtn } from '../../types/types';
 import { inc, reset } from '../../mock/data';
+import { useSelector } from 'react-redux';
+import { TRootReducer } from '../../store/store';
 
 type TControlButtonsProps = {
-	disabledBtns: Record<string, TDisabledBtn>;
 	onChangeIncHandler: () => void;
 	onChangeResetHandler: () => void;
 };
 
-export const ControlButtons = ({ disabledBtns, onChangeIncHandler, onChangeResetHandler }: TControlButtonsProps) => {
+export const ControlButtons = ({ onChangeIncHandler, onChangeResetHandler }: TControlButtonsProps) => {
+	const controlButtons = useSelector<TRootReducer, Record<string, TDisabledBtn>>(state => state.buttons);
 	return (
 		<StyledControlButtons>
-			<Button disabled={disabledBtns[inc].disabled} callBack={onChangeIncHandler}>
+			<Button disabled={controlButtons[inc].disabled} callBack={onChangeIncHandler}>
 				inc
 			</Button>
-			<Button disabled={disabledBtns[reset].disabled} callBack={onChangeResetHandler}>
+			<Button disabled={controlButtons[reset].disabled} callBack={onChangeResetHandler}>
 				reset
 			</Button>
 		</StyledControlButtons>

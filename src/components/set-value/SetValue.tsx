@@ -1,17 +1,18 @@
 import { styled } from 'styled-components';
 import { Button } from '../button/Button';
-import { TDisabledBtn, TValue } from '../../types/types';
+import { useSelector } from 'react-redux';
+import { TRootReducer } from '../../store/store';
+import { set } from '../../mock/data';
 
 type TSetValueProps = {
 	setValuesHandler: () => void;
-	values: Record<string, TValue>;
-	disabledBtns: TDisabledBtn;
 };
 
-export const SetValue = ({ disabledBtns, setValuesHandler }: TSetValueProps) => {
+export const SetValue = ({ setValuesHandler }: TSetValueProps) => {
+	const setBtnState = useSelector<TRootReducer, boolean>(state => state.buttons[set].disabled);
 	return (
 		<StyledSetValue>
-			<Button disabled={disabledBtns.disabled} callBack={setValuesHandler}>
+			<Button disabled={setBtnState} callBack={setValuesHandler}>
 				set
 			</Button>
 		</StyledSetValue>

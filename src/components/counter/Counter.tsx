@@ -15,7 +15,6 @@ import { TDisabledBtn, TValue } from '../../types/types';
 
 export const Counter = () => {
 	const dispatch = useDispatch();
-	const values = useSelector<TRootReducer, Record<string, TValue>>(state => state.values);
 	const startValue = useSelector<TRootReducer, TValue>(state => state.values[start]);
 	const maxValue = useSelector<TRootReducer, TValue>(state => state.values[max]);
 	const boardValue = useSelector<TRootReducer, TValue>(state => state.values[board]);
@@ -28,52 +27,10 @@ export const Counter = () => {
 	const onChangeValue = (key: string, value: number) => {
 		dispatch(changeValueAC(key, value));
 
-		dispatch(changeSetAC(value < 0 ? true : false));
+		dispatch(changeSetAC(maxError || startError));
 		dispatch(changeIncAC(false));
 		dispatch(changeResetAC(false));
 	};
-
-	const prom = new Promise((resolve, reject) => {
-		setTimeout(
-			response => {
-				if (response.status >= 200 && response.status < 400) {
-					resolve(response.data);
-				} else {
-					reject(response.error);
-				}
-			},
-			2000,
-			{ status: 400, data: { name: 'Tom Riddle', age: 17, murders: 4 }, error: 'Not found' }
-		);
-	});
-
-	prom
-		.then(
-			res => {
-				console.log(res);
-
-				return new Promise((resolve, reject) => {
-					setTimeout(
-						response => {
-							if (response.status >= 200 && response.status < 400) {
-								resolve({ res: res, res2: response.data });
-							} else {
-								reject(response.error);
-							}
-						},
-						2000,
-						{ status: 200, data: { school: 'Hogwarts', house: 'Slytherin' }, error: {} }
-					);
-				});
-			},
-			err => {
-				console.log('err', err);
-				return { name: 'Tom Riddle' };
-			}
-		)
-		.then(res2 => {
-			console.log(res2, 'newData');
-		});
 
 	const onChangeIncHandler = () => {
 		const newBoardValue = boardValue.value + 1;
@@ -119,17 +76,13 @@ export const Counter = () => {
 	return (
 		<StyledCounter>
 			<FlexWrapper gap='20px' direction='column'>
-				<ValueFields startError={startError} maxError={maxError} onChangeValue={onChangeValue} values={values} />
-				<SetValue disabledBtns={controlButtons[set]} values={values} setValuesHandler={setValuesHandler} />
+				<ValueFields startError={startError} maxError={maxError} onChangeValue={onChangeValue} />
+				<SetValue setValuesHandler={setValuesHandler} />
 			</FlexWrapper>
 
 			<FlexWrapper gap='20px' direction='column'>
 				<InfoBoard boardError={boardError} boardValue={boardValue} />
-				<ControlButtons
-					disabledBtns={controlButtons}
-					onChangeIncHandler={onChangeIncHandler}
-					onChangeResetHandler={onChangeResetHandler}
-				/>
+				<ControlButtons onChangeIncHandler={onChangeIncHandler} onChangeResetHandler={onChangeResetHandler} />
 			</FlexWrapper>
 		</StyledCounter>
 	);

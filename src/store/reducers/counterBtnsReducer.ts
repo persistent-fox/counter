@@ -4,7 +4,7 @@ import { TDisabledBtn } from '../../types/types';
 const initialState: Record<string, TDisabledBtn> = {
 	[set]: {
 		id: set,
-		disabled: false,
+		disabled: true,
 	},
 	[inc]: {
 		id: inc,
