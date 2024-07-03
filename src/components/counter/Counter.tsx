@@ -11,14 +11,13 @@ import { changeValueAC, incrementValueAC, resetValueAC } from '../../store/reduc
 import { useSelector } from 'react-redux';
 import { TRootReducer } from '../../store/store';
 import { changeIncAC, changeResetAC, changeSetAC } from '../../store/reducers/counterBtnsReducer';
-import { TDisabledBtn, TValue } from '../../types/types';
+import { TValue } from '../../types/types';
 
 export const Counter = () => {
 	const dispatch = useDispatch();
 	const startValue = useSelector<TRootReducer, TValue>(state => state.values[start]);
 	const maxValue = useSelector<TRootReducer, TValue>(state => state.values[max]);
 	const boardValue = useSelector<TRootReducer, TValue>(state => state.values[board]);
-	const controlButtons = useSelector<TRootReducer, Record<string, TDisabledBtn>>(state => state.buttons);
 
 	const maxError = maxValue.value <= startValue.value || maxValue.value < 0;
 	const startError = maxValue.value <= startValue.value || startValue.value < 0;
@@ -27,16 +26,16 @@ export const Counter = () => {
 	const onChangeValue = (key: string, value: number) => {
 		dispatch(changeValueAC(key, value));
 
-		dispatch(changeSetAC(maxError || startError));
-		dispatch(changeIncAC(false));
-		dispatch(changeResetAC(false));
+		dispatch(changeIncAC(true));
+		dispatch(changeResetAC(true));
+		dispatch(changeSetAC(boardError));
 	};
 
 	const onChangeIncHandler = () => {
 		const newBoardValue = boardValue.value + 1;
 
 		if (newBoardValue <= maxValue.value) {
-			dispatch(incrementValueAC(boardValue.value));
+			dispatch(incrementValueAC(newBoardValue));
 		}
 		if (newBoardValue === maxValue.value) {
 			dispatch(changeIncAC(true));
@@ -53,8 +52,39 @@ export const Counter = () => {
 		dispatch(changeIncAC(false));
 		dispatch(changeSetAC(true));
 		dispatch(changeResetAC(false));
-		localStorage.setItem('values', JSON.stringify(startValue.value));
-		localStorage.setItem('buttons', JSON.stringify(controlButtons));
+		const obj = {
+			[start]: {
+				id: start,
+				title: 'start value',
+				value: startValue.value,
+			},
+			[max]: {
+				id: max,
+				title: 'max value',
+				value: maxValue.value,
+			},
+			[board]: {
+				id: board,
+				title: 'board',
+				value: startValue.value,
+			},
+		};
+		const btns = {
+			[set]: {
+				id: set,
+				disabled: true,
+			},
+			[inc]: {
+				id: inc,
+				disabled: false,
+			},
+			[reset]: {
+				id: reset,
+				disabled: true,
+			},
+		};
+		localStorage.setItem('values', JSON.stringify(obj));
+		localStorage.setItem('buttons', JSON.stringify(btns));
 	};
 
 	useEffect(() => {
@@ -81,7 +111,7 @@ export const Counter = () => {
 			</FlexWrapper>
 
 			<FlexWrapper gap='20px' direction='column'>
-				<InfoBoard boardError={boardError} boardValue={boardValue} />
+				<InfoBoard startError={startError} maxError={maxError} boardError={boardError} boardValue={boardValue} />
 				<ControlButtons onChangeIncHandler={onChangeIncHandler} onChangeResetHandler={onChangeResetHandler} />
 			</FlexWrapper>
 		</StyledCounter>

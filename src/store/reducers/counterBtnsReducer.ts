@@ -8,11 +8,11 @@ const initialState: Record<string, TDisabledBtn> = {
 	},
 	[inc]: {
 		id: inc,
-		disabled: false,
+		disabled: true,
 	},
 	[reset]: {
 		id: reset,
-		disabled: false,
+		disabled: true,
 	},
 };
 
